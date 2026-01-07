@@ -74,7 +74,7 @@ public class RedisConfig {
 
       @Bean
     public RedisConnectionFactory connectionFactory() {
-        return new LettuceConnectionFactory("localhost",6380);
+        return new LettuceConnectionFactory("redis-livematch",6380);
 
       }
     @Bean

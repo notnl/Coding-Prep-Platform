@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Loader2, Ban, Swords, Play } from 'lucide-react';
-import { PlayerCard } from '../components/PlayerCard';
 import type { LobbyState, Player, MatchEvent,SwitchTeamRequest } from '../types/match';
 import { getMatchLobbyState, startMatch,switchTeam } from '../services/matchService';
 import { stompService } from '../../../core/sockets/stompClient';

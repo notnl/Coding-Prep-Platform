@@ -38,11 +38,10 @@ export default function Login({theme} : Props){
                        ).then((resolvedResponse : Response) => {
                             return resolvedResponse.json()
                        }).catch(
-                                
+                                (e) => {
+                                    console.log("Caught htis : " + e)
+                                }
                        )
-
-
-                       console.log(r)
 
                        auth?.handleLoginSuccess(r.accessToken,r.refreshToken)
                        

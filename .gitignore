@@ -51,6 +51,8 @@ out/
 .springBeans
 .sts4-cache
 
+#Ignore built jar upon running RunService.sh
+backend/judge0-v1.13.1/SpringBoot/*.jar
 # Don't ignore build directories in source folders (if any)
 !**/src/main/**/build/
 !**/src/test/**/build/

@@ -6,6 +6,12 @@ x-logging:
       max-size: 100M
 
 services:
+  springboot:
+    build:
+      context: ./SpringBoot
+    ports:
+      - "8080:8080"
+
   server:
     image: judge0/judge0:1.13.1
     volumes:

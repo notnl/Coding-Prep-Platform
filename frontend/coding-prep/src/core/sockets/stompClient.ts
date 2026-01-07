@@ -15,16 +15,25 @@ class StompService {
     private stompClient: Client;
     private isConnected = false;
     private subscriptionQueue: SubscriptionRequest[] = [];
+    private bearerToken : string = "";
+
+    public setBearerToken(cString : string) {
+        this.bearerToken = cString;
+    }
 
     constructor() {
+
         this.stompClient = new Client({
-            webSocketFactory: () => new SockJS("http://localhost:8080/ws", null, { transports: ['websocket'] }), //Connect to our springboot backend
+            //webSocketFactory: () => new SockJS("http://localhost:8080/ws",null , { transports: ['websocket'] }), //Connect to our springboot backend
+            webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
             reconnectDelay: 5000,
             onConnect: () => {
                 console.log('STOMP Client Connected');
                 this.isConnected = true;
                 this.processSubscriptionQueue(); // Subscribe to our message brokers
             },
+            
+
             onDisconnect: () => {
                 console.log('STOMP Client Disconnected');
                 this.isConnected = false;
@@ -39,7 +48,6 @@ class StompService {
     
     private processSubscriptionQueue() {
         this.subscriptionQueue.forEach(req => {
-            console.log(req);
             const sub = this.stompClient.subscribe(req.destination, req.callback);
             req.subscription(sub);
         });

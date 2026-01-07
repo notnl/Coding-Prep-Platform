@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.codingprep"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.0"
 description = "Demo project for Spring Boot"
 
 java {

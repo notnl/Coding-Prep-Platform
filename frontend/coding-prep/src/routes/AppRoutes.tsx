@@ -4,8 +4,6 @@ import Home from "src/pages/Home";
 import ProfilePage from "src/features/profile/pages/ProfilePage";
 import MatchLobbyPage from "src/features/match/pages/MatchLobbyPage";
 import MatchArenaPage from "src/features/match/pages/MatchArenaPage";
-import MatchArenaPageTest from "src/features/match/pages/MatchArenaPageTest";
-import MatchDiscussionOverlay from "src/features/match/components/MatchDiscussionOverlay";
 import MatchResultPage from "src/features/match/pages/MatchResultPage";
 
 export default function AppRoutes() {

@@ -239,7 +239,6 @@ const MatchArenaPage: React.FC = () => {
 
 
         if (shouldRedirect && matchId) {
-            console.log("Why is this here : ")
             navigate(`/match/results/${matchId}`, { replace: true });
         }
     }, [shouldRedirect, matchId,auth?.userStatus?.in_match, navigate]);
@@ -266,7 +265,6 @@ const MatchArenaPage: React.FC = () => {
             return
         } 
 
-        console.log("call get discussoin")
         const allD : MatchDiscussion = await getDiscussionData(matchId);
         setTeamCode(allD)
                 
@@ -284,7 +282,6 @@ const MatchArenaPage: React.FC = () => {
         } 
 
         const allD : SubmissionDetails[] = await getAllSubmissionRefresh(matchId);
-        console.log(allD)
         const mapSumDetails : SubmissionSummary[]  = allD.map( 
                 (i,ind) => {
                     return ({
@@ -444,8 +441,6 @@ const MatchArenaPage: React.FC = () => {
     }
 
     const handleSubmit = async (tabToSubmit : number) => {
-        console.log( currentProblem)
-        console.log( tabToSubmit)
         if (!arenaData?.problemDetails || isSubmitting || isCoolingDown || matchState !== 'IN_PROGRESS' || tabToSubmit == submissionTab || tabToSubmit != currentProblem || !auth?.userStatus) return;
         setIsSubmitting(true);
         
@@ -456,7 +451,6 @@ const MatchArenaPage: React.FC = () => {
 
         try {
 
-        console.log(matchId)
             const response = await createSubmission({
                 problemId: arenaData.problemDetails[tabToSubmit].id, // 
                 language:language, code:code[tabToSubmit], 
