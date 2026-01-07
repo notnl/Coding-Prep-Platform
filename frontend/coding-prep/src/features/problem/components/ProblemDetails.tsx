@@ -17,6 +17,7 @@ const ProblemDetails: React.FC<ProblemDetailsProps> = ({ problem }) => {
         return JSON.stringify(data, null, 2);
     };
 
+
     return (
 
         <div className="p-6 overflow-y-auto h-full bg-white dark:bg-zinc-900 text-gray-900 dark:text-gray-100">
@@ -32,9 +33,10 @@ const ProblemDetails: React.FC<ProblemDetailsProps> = ({ problem }) => {
                 <p dangerouslySetInnerHTML={{ __html: problem.description }}></p>
 
                 <h2 className="text-xl font-semibold mt-6 mb-2">Constraints</h2>
-                <div>
-                    {problem.constraints.split('•').filter(c => c.trim()).map((constraint, index) => (
-                        <p key={index} className="m-0">
+                <div className='bg-gray-100 dark:bg-zinc-800 p-3 rounded-md'>
+                    {
+                        problem.constraints.split('\n').filter(c => c.trim()).map((constraint, index) => (
+                        <p key={index} className="m-4">
                             • {constraint.trim()}
                         </p>
                     ))}

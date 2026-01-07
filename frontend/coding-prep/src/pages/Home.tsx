@@ -53,11 +53,17 @@ export default function Home({theme} : Props){
         <Navbar/>
 
             <div className="flex flex-col border-2 border-solid mx-10 my-10 h-[64rem] ">
-                    <div className="flex mx-10 my-10 gap-5">
+                    <div className="flex mx-10 my-10 gap-5 justify-between">
 
                             <span className='px-3 py-1 text-5xl font-bold rounded-full'>
                                 Match Rooms
                             </span>
+
+            <button
+              className="  min-w-1/8 min-h-1/4 my-5 mx-5 bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-3 px-4 rounded-md transition-transform transform hover:scale-105 disabled:bg-orange-900/50 disabled:cursor-not-allowed disabled:transform-none" onClick={() => fetchAllLobby}
+              >
+                Refresh
+              </button>
 
 
                     </div>

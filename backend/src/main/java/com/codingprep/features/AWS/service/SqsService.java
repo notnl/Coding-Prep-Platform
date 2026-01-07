@@ -35,6 +35,7 @@ public class SqsService {
             SendMessageRequest sendMessageRequest = SendMessageRequest.builder()
                     .queueUrl(queueUrl)
                     .messageBody(submissionId.toString())
+                    .messageGroupId("submission")
                     .build();
 
             logger.debug("{} Dispatching message to SQS...", logPrefix);

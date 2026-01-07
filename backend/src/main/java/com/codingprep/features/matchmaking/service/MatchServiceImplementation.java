@@ -1,5 +1,6 @@
 package com.codingprep.features.matchmaking.service;
 
+import com.codingprep.features.auth.dto.UserStatusDTO;
 import com.codingprep.features.auth.models.UserStatus;
 import com.codingprep.features.auth.repository.UserRepository;
 import com.codingprep.features.auth.repository.UserStatusRepository;
@@ -235,42 +236,27 @@ public class MatchServiceImplementation implements MatchService {
             throw new IllegalArgumentException("This match is not in its lobby stage, can't join");
         }
 
-        if (getAllPlayersFromCache(match.getMatchId()).size() >= match.getMax_player_count()) {
+
+        List<PlayerMatchDTO> allP = getAllPlayersFromCache(match.getMatchId());
+
+        if (allP.size() >= match.getMax_player_count()) {
             throw new IllegalArgumentException("Lobby is full");
         }
 
-        //if (Objects.equals(match.getHost_id(), joiningUserId)) {
-        //    throw new IllegalArgumentException("You cannot join a room you created.");
-        //}
-
-         
-        for (PlayerMatchDTO t : getAllPlayersFromCache(match.getMatchId())){
+        for (PlayerMatchDTO t : allP){
 
             if (t.player_id == joiningUserId) { 
 
-                UserStatus curUserStatus = userStatusRepository.findById(joiningUserId).orElseThrow();
-                curUserStatus.setIn_match(match.getMatchId());
-                userStatusRepository.save(curUserStatus); // Ensure that our user is in the match
 
                 return new JoinMatchResponse(match.getMatchId()); //Handle rejoin
             }
         
         }
 
-        //match.setPlayerTwoId(joiningUserId);
-        //match.setStatus(MatchStatus.SCHEDULED);
-
-        System.out.println("Match:" + match) ; 
 
 
         matchRedisService.addPlayer(match.getMatchId(), PlayerMatchDTO.builder().player_id(joiningUserId).player_username(joiningUserName).player_team(0).build()); // Add player to the match
 
-        //List<PlayerMatchDTO> oldList = getAllPlayersFromCache();
-        // 
-        //oldList.add(PlayerMatchDTO.builder().player_id(joiningUserId).player_username(joiningUserName).player_team(0).build());
-
-        //match.setAllPlayers(oldList);
-        //matchR
         liveMatchStateRepository.save(match);
 
         matchNotificationService.notifyPlayerJoined(match.getMatchId(),"PLAYER_JOINED");
@@ -399,7 +385,8 @@ public class MatchServiceImplementation implements MatchService {
 
         for (LiveMatchStateDTO l : match) {
 
-                if (l != null){
+                if (l != null && l.getMatchStatus() == MatchStatus.IN_LOBBY){
+
                         target.add(LobbyDetailsDTO.builder().matchId(l.getMatchId()).roomCode(l.getRoomCode()).build());
                 }
         }
@@ -447,6 +434,28 @@ public class MatchServiceImplementation implements MatchService {
         matchNotificationService.notifyMatchUpdate(matchId,"MATCH_END");
 
         liveMatchStateRepository.delete(match); //Can remove from cache
+                                                //
+                                               
+        List<PlayerMatchDTO> alP =matchRedisService.getAllPlayers(matchId);
+        //UserStatusDTO
+        //userStatusRepository.save(entity)
+        for (PlayerMatchDTO playerMatchDTO : alP) {
+
+        UserStatus curUserStatus = userStatusRepository.findById(playerMatchDTO.getPlayer_id()).orElseThrow();
+
+        curUserStatus.setIn_match(null);
+        userStatusRepository.save(curUserStatus);
+        }
+
+
+    //public List<PlayerMatchDTO> getAllPlayers(UUID matchId) {
+
+    //    String key = PlayerKeyString(matchId);
+
+    //    return playerTemplate.opsForHash().values(key).stream().filter(PlayerMatchDTO.class::isInstance).map(
+    //            PlayerMatchDTO.class::cast).toList();
+
+    //}
         
 
    }

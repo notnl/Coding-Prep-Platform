@@ -2,8 +2,7 @@ import React, { createContext, useState, useEffect, useCallback, type ReactNode 
 import { useNavigate } from 'react-router';
 import { jwtDecode } from 'jwt-decode';
 
-import type { CredentialResponse } from '@react-oauth/google';
-import {  fetchMyPermissions,fetchUserStatus } from '../../features/auth/services/authService';
+import {  fetchUserStatus } from '../../features/auth/services/authService';
 import type { UserStatus } from 'src/features/match/types/match';
 
 interface DecodedToken {

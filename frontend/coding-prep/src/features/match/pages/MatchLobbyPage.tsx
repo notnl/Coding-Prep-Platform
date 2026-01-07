@@ -65,7 +65,7 @@ const MatchLobbyPage: React.FC = () => {
   const fetchFullLobbyData = useCallback(async () => {
     if (!matchId) return;
     try {
-      if (!lobbyState) setStatusMessage('Synchronizing Match Data...');
+      //if (!lobbyState) setStatusMessage('Synchronizing Match Data...');
       const state: LobbyState = await getMatchLobbyState(matchId);
 
       //auth?.setUserTeam(state.allPlayers.find(
