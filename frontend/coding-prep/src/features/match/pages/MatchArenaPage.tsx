@@ -67,40 +67,72 @@ const useMatchEvents = (
     onMatchNextProblem: () => void,
     onCountdownStart: (data: { startTime: number; duration: number }) => void
 ) => {
+    // useRef to store stable callbacks
+    const callbacksRef = useRef({
+        onMatchEnd,
+        onMatchDiscussion,
+        onMatchProgress,
+        onMatchNextProblem,
+        onCountdownStart
+    });
+
+    // Update ref on each render
+    useEffect(() => {
+        callbacksRef.current = {
+            onMatchEnd,
+            onMatchDiscussion,
+            onMatchProgress,
+            onMatchNextProblem,
+            onCountdownStart
+        };
+    });
+
+    // Stable event handlers
     const handleMatchEvent = useCallback((event: any) => {
+        const { onMatchEnd, onMatchDiscussion, onMatchProgress, onMatchNextProblem } = callbacksRef.current;
         if (event.eventType === 'MATCH_END') {
             onMatchEnd();
-        } else if ( event.eventType === 'MATCH_DISCUSSION') {
-            onMatchDiscussion()
-        }else if ( event.eventType === 'MATCH_PROGRESS'){
-            onMatchProgress();  //Reset to match progress state
-        }else if ( event.eventType === 'MATCH_NEXTPROBLEM') {
+        } else if (event.eventType === 'MATCH_DISCUSSION') {
+            onMatchDiscussion();
+        } else if (event.eventType === 'MATCH_PROGRESS') {
+            onMatchProgress();
+        } else if (event.eventType === 'MATCH_NEXTPROBLEM') {
             onMatchNextProblem();
         }
-    }, [onMatchEnd]);
-
-
+    }, []); // Empty dependencies - stable function
 
     const handleCountdownEvent = useCallback((event: any) => {
+        const { onCountdownStart } = callbacksRef.current;
         if (event.eventType === 'MATCH_COUNTDOWN_STARTED') {
             onCountdownStart(event.payload);
         }
-    }, [onCountdownStart]);
+    }, []); // Empty dependencies - stable function
 
     useEffect(() => {
         if (!matchId) return;
+        
+        // Check if already connected
         stompService.connect();
 
-        console.log("Subscribe and connected to this");
+        console.log("Subscribe and connected to this - RUNNING ONLY ONCE");
+
         const subs = [
             stompService.subscribeToMatchUpdates(matchId, handleMatchEvent),
             stompService.subscribeToCountdown(matchId, handleCountdownEvent),
         ];
 
         return () => {
-            subs.forEach(sub => { if (sub) sub.unsubscribe() });
+            subs.forEach(sub => { 
+                if (sub) {
+                    try {
+                        sub.unsubscribe();
+                    } catch (e) {
+                        console.warn("Error unsubscribing:", e);
+                    }
+                }
+            });
         };
-    }, [matchId, handleMatchEvent, handleCountdownEvent]);
+    }, [matchId, handleMatchEvent, handleCountdownEvent]); // Now these are stable
 };
 
 
