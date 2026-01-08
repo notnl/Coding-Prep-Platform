@@ -242,6 +242,12 @@ const MatchArenaPage: React.FC = () => {
         }
 
 
+
+        if (shouldRedirect && matchId) {
+            navigate(`/match/results/${matchId}`, { replace: true });
+        }
+    }, [shouldRedirect, matchId,auth?.userStatus?.in_match, navigate]);
+
     useMatchEvents(matchId,
         () => {
             setMatchState('COMPLETED');
@@ -259,14 +265,6 @@ const MatchArenaPage: React.FC = () => {
             setTimerData(payload);
         }
     );
-
-
-
-        if (shouldRedirect && matchId) {
-            navigate(`/match/results/${matchId}`, { replace: true });
-        }
-    }, [shouldRedirect, matchId,auth?.userStatus?.in_match, navigate]);
-
 
 
     const getDiscussionCode = async () => { 
