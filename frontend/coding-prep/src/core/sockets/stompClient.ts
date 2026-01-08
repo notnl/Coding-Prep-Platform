@@ -19,13 +19,14 @@ class StompService {
 
     public setBearerToken(cString : string) {
         this.bearerToken = cString;
+
     }
 
     constructor() {
 
         this.stompClient = new Client({
             //webSocketFactory: () => new SockJS("http://localhost:8080/ws",null , { transports: ['websocket'] }), //Connect to our springboot backend
-            webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+            webSocketFactory: () => new SockJS("/ws"),
             reconnectDelay: 5000,
             onConnect: () => {
                 console.log('STOMP Client Connected');
@@ -87,6 +88,8 @@ class StompService {
     }
 
     public connect() {
+
+        console.log(SOCKET_URL)
         if (!this.stompClient.active && !this.stompClient.connected) {
             console.log("Activating STOMP client...");
             this.stompClient.activate();

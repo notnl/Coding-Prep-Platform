@@ -26,7 +26,7 @@ export default function Login({theme} : Props){
     const HandleSubmit = async (e: React.FormEvent) => {
             e.preventDefault();
             try {
-             const r : LoginResponseType  = await fetch('http://localhost:8080/api/v1/auth/login', 
+             const r : LoginResponseType  = await fetch('/api/v1/auth/login', 
                         {
                                         method:"POST",
                                         body: JSON.stringify({username:userName , password:password}),

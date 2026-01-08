@@ -20,6 +20,7 @@ function App() {
 
   useEffect(() => {
       if (!auth) { 
+        console.log("Just return")
         return 
       }
     // This logic will now run whenever the user logs in or out

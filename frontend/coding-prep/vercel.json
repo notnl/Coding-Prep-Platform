@@ -1,0 +1,17 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://mal-js.click/api/:path*"
+    },
+    {
+      "source": "/ws/:path*",
+      "destination": "https://mal-js.click/ws/:path*"
+    },
+    {
+      "source": "/((?!api/|ws/|assets/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+

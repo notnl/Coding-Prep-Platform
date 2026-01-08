@@ -14,7 +14,6 @@ export default function ProfilePage({theme} : Props){
 
 
     const HandleSubmit = (matchID : string) => {
-        console.log("Clicked with id :" + matchID)
     }
 
 

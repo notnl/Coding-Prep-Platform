@@ -16,8 +16,8 @@ services:
     image: judge0/judge0:1.13.1
     volumes:
       - ./judge0.conf:/judge0.conf:ro
-    ports:
-      - "2358:2358"
+#    ports:
+#      - ":2358"
     privileged: true
     <<: *default-logging
     restart: always
@@ -45,8 +45,8 @@ services:
       "bash", "-c",
       'docker-entrypoint.sh --appendonly no --requirepass "$$REDIS_PASSWORD"'
     ]
-    ports:
-      - '6379:6379'
+#    ports:
+#      - ':6379'
     env_file: judge0.conf
     <<: *default-logging
     restart: always
@@ -57,8 +57,8 @@ services:
       "bash", "-c",
       'docker-entrypoint.sh --appendonly no --port 6380'
     ]
-    ports:
-      - '6380:6380'
+#    ports:
+#      - ':6380'
     <<: *default-logging
     restart: always
     volumes:
