@@ -36,6 +36,7 @@ public class SqsService {
                     .queueUrl(queueUrl)
                     .messageBody(submissionId.toString())
                     .messageGroupId("submission")
+                    .messageDeduplicationId(submissionId.toString())
                     .build();
 
             logger.debug("{} Dispatching message to SQS...", logPrefix);

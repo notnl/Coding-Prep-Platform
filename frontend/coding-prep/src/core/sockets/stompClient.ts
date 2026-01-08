@@ -15,7 +15,6 @@ class StompService {
     private stompClient: Client;
     private isConnected = false;
     private subscriptionQueue: SubscriptionRequest[] = [];
-    private bearerToken : string = "";
 
     public setBearerToken(cString : string) {
         this.bearerToken = cString;
@@ -89,7 +88,6 @@ class StompService {
 
     public connect() {
 
-        console.log(SOCKET_URL)
         if (!this.stompClient.active && !this.stompClient.connected) {
             console.log("Activating STOMP client...");
             this.stompClient.activate();
