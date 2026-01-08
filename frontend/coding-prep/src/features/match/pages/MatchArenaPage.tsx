@@ -426,7 +426,7 @@ const MatchArenaPage: React.FC = () => {
             return
         }
 
-        setCurrentProblem(hostNextRes)
+        //setCurrentProblem(hostNextRes) // host will get updated by the event instead
         
 
     }

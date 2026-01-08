@@ -58,6 +58,9 @@ public class MatchNotificationServiceImplementation implements MatchNotification
         Map<String, Object> message = Map.of(
             "eventType", eventType
             );
+
+
+        System.out.println("[WS_NOTIFY matchId={}] -> Sending  event." +  eventType);
         messagingTemplate.convertAndSend(destination,(Object)message);
 
 
@@ -71,6 +74,7 @@ public class MatchNotificationServiceImplementation implements MatchNotification
         //Map<String, Object> message = Map.of(
         //    "eventType", ""
         //    );
+
 
         messagingTemplate.convertAndSend(destination, "");
 
