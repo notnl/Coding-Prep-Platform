@@ -479,6 +479,8 @@ public class MatchServiceImplementation implements MatchService {
         match.setCurrentProblem(nextProblem);
 
         liveMatchStateRepository.save(match);
+
+        matchNotificationService.notifyMatchUpdate(matchId,"MATCH_PROGRESS");
         return nextProblem;
 
         

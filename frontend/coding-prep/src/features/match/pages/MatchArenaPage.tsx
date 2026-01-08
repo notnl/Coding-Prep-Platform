@@ -27,6 +27,7 @@ const useArenaData = (matchId: string | undefined) => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [shouldRedirect, setShouldRedirect] = useState(false);
+    const [shouldRefresh, setShouldRefresh] = useState(false);
 
     useEffect(() => {
         if (!matchId) {
@@ -34,6 +35,7 @@ const useArenaData = (matchId: string | undefined) => {
             setIsLoading(false);
             return;
         }
+        console.log("fetch more data")
         const fetchDetails = async () => {
             try {
                 const data = await getArenaData(matchId);
@@ -51,9 +53,9 @@ const useArenaData = (matchId: string | undefined) => {
             }
         };
         fetchDetails();
-    }, [matchId]);
+    }, [matchId,shouldRefresh]);
 
-    return { arenaData, isLoading, error, shouldRedirect };
+    return { arenaData, isLoading, error, shouldRedirect,setShouldRefresh };
 };
 
 
@@ -70,7 +72,6 @@ const useMatchEvents = (
         } else if ( event.eventType === 'MATCH_DISCUSSION') {
             onMatchDiscussion()
         }else if ( event.eventType === 'MATCH_PROGRESS'){
-
             onMatchProgress();  //Reset to match progress state
         }
     }, [onMatchEnd]);
@@ -86,6 +87,7 @@ const useMatchEvents = (
     useEffect(() => {
         if (!matchId) return;
         stompService.connect();
+
         const subs = [
             stompService.subscribeToMatchUpdates(matchId, handleMatchEvent),
             stompService.subscribeToCountdown(matchId, handleCountdownEvent),
@@ -119,7 +121,7 @@ const MatchArenaPage: React.FC = () => {
     const  auth  = useContext<AuthContextType | undefined>(AuthContext)
     const [currentProblem, setCurrentProblem] = useState(0)
 
-    const { arenaData, isLoading, error, shouldRedirect } = useArenaData(matchId);
+    const { arenaData, isLoading, error, shouldRedirect,setShouldRefresh } = useArenaData(matchId);
     const [timerData, setTimerData] = useState<{ startTime: number; duration: number } | null>(null);
     const [matchState, setMatchState] = useState<'LOADING' | 'IN_PROGRESS' | 'DISCUSSION'| 'AWAITING_RESULT' | 'COMPLETED'>('LOADING');
     const [teamCode, setTeamCode] = useState<MatchDiscussion>({allCode:[]}); 
@@ -237,7 +239,6 @@ const MatchArenaPage: React.FC = () => {
 
 
 
-
         if (shouldRedirect && matchId) {
             navigate(`/match/results/${matchId}`, { replace: true });
         }
@@ -253,6 +254,7 @@ const MatchArenaPage: React.FC = () => {
         },
         () => {
             setMatchState('IN_PROGRESS'); // Just reset back to in progress state
+            setShouldRefresh(prev => !prev)
         },
         (payload) => {
             setTimerData(payload);
