@@ -20,8 +20,8 @@ class StompService {
 
         this.stompClient = new Client({
             //webSocketFactory: () => new SockJS("http://localhost:8080/ws",null , { transports: ['websocket'] }), //Connect to our springboot backend
-            webSocketFactory: () => new SockJS("/ws",null,{ transports: ['websocket'] }),
-            reconnectDelay: 5000,
+            webSocketFactory: () => new SockJS("/ws"),
+            reconnectDelay: 1000,
             onConnect: () => {
                 console.log('STOMP Client Connected');
                 this.isConnected = true;
