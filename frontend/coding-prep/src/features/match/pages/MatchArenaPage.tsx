@@ -40,6 +40,8 @@ const useArenaData = (matchId: string | undefined) => {
             try {
                 const data = await getArenaData(matchId);
                 setArenaData(data);
+
+                console.log("Fetched arena data : " + data)
                  
             } catch (err: any) {
                 if (err.response?.status === 409) {
@@ -254,6 +256,7 @@ const MatchArenaPage: React.FC = () => {
         },
         () => {
             setMatchState('IN_PROGRESS'); // Just reset back to in progress state
+            console.log("Match state before is in progress")
             setShouldRefresh(prev => !prev)
         },
         (payload) => {

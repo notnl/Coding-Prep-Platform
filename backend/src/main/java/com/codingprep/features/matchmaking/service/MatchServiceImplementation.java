@@ -403,6 +403,8 @@ public class MatchServiceImplementation implements MatchService {
             throw new IllegalArgumentException("Not host");
         }
 
+        System.out.println("Host start discussion" + userId + " For match : " + match) ;
+        
         // Toggle start and end discussion
         if (match.getMatchStatus() == MatchStatus.IN_PROGRESS) { 
             match.setMatchStatus(MatchStatus.DISCUSSION);
