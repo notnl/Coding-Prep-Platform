@@ -16,11 +16,6 @@ class StompService {
     private isConnected = false;
     private subscriptionQueue: SubscriptionRequest[] = [];
 
-    public setBearerToken(cString : string) {
-        this.bearerToken = cString;
-
-    }
-
     constructor() {
 
         this.stompClient = new Client({
