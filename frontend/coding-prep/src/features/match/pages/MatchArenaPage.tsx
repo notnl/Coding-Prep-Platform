@@ -35,13 +35,11 @@ const useArenaData = (matchId: string | undefined) => {
             setIsLoading(false);
             return;
         }
-        console.log("fetch more data")
         const fetchDetails = async () => {
             try {
                 const data = await getArenaData(matchId);
                 setArenaData(data);
 
-                console.log("Fetched arena data : " + data)
                  
             } catch (err: any) {
                 if (err.response?.status === 409) {
@@ -66,6 +64,7 @@ const useMatchEvents = (
     onMatchEnd: () => void,
     onMatchDiscussion: () => void,
     onMatchProgress: () => void,
+    onMatchNextProblem: () => void,
     onCountdownStart: (data: { startTime: number; duration: number }) => void
 ) => {
     const handleMatchEvent = useCallback((event: any) => {
@@ -75,6 +74,8 @@ const useMatchEvents = (
             onMatchDiscussion()
         }else if ( event.eventType === 'MATCH_PROGRESS'){
             onMatchProgress();  //Reset to match progress state
+        }else if ( event.eventType === 'MATCH_NEXTPROBLEM') {
+            onMatchNextProblem();
         }
     }, [onMatchEnd]);
 
@@ -256,8 +257,8 @@ const MatchArenaPage: React.FC = () => {
         },
         () => {
             setMatchState('IN_PROGRESS'); // Just reset back to in progress state
-            console.log("Match state before is in progress")
-            setShouldRefresh(prev => !prev)
+        },() => { 
+            setCurrentProblem(prev => prev+1) // next problem
         },
         (payload) => {
             setTimerData(payload);
