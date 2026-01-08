@@ -112,6 +112,8 @@ class StompService {
 
     public subscribeToDiscussion(matchId: string, onEvent: (event: any) => void): StompSubscription {
 
+
+        console.log("Subscribed and connected");
         return this.subscribe(`/topic/match/${matchId}/discussion`, onEvent);
     }
 

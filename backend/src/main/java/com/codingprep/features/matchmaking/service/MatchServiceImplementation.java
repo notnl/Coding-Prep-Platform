@@ -132,7 +132,9 @@ public class MatchServiceImplementation implements MatchService {
         System.out.println(retPoints);
         return retPoints;
     }
+
     @Override
+    @Transactional
     public CreateMatchResponse createMatch(CreateMatchRequest request, Long creatorId, String creatorUsername) {
         if (request.getDifficultyMin() > request.getDifficultyMax()) {
             throw new IllegalArgumentException("Minimum difficulty cannot be greater than maximum difficulty.");
@@ -282,6 +284,7 @@ public class MatchServiceImplementation implements MatchService {
     }
 
     @Override
+    @Transactional
     public void startLobbyCountdown(UUID matchId) {
 
         MatchRoom match = matchRepository.findById(matchId).orElseThrow(() -> new IllegalArgumentException("Match not found with id: " + matchId));
@@ -319,6 +322,8 @@ public class MatchServiceImplementation implements MatchService {
 
     }
     @Override
+
+    @Transactional(readOnly = true)
     public MatchStateResponseDTO getMatchState(UUID matchId) {
 
         //Optional<MatchRoom> match = matchRepository.findById(matchId);
@@ -375,6 +380,8 @@ public class MatchServiceImplementation implements MatchService {
 
 
 
+    @Override
+    @Transactional
     public  List<LobbyDetailsDTO> getAllLobby(){
 
         Iterable<LiveMatchStateDTO> match = liveMatchStateRepository.findAll();
@@ -396,10 +403,11 @@ public class MatchServiceImplementation implements MatchService {
     }
 
     @Override
+    @Transactional
    public void hostStartDiscussion(UUID matchId, Long userId){
 
         LiveMatchStateDTO match = liveMatchStateRepository.findById(matchId).orElseThrow();
-        if (match.getHostId() != userId) { 
+        if (!match.getHostId().equals(userId)) { 
             throw new IllegalArgumentException("Not host");
         }
 
@@ -420,6 +428,8 @@ public class MatchServiceImplementation implements MatchService {
    }
 
     @Override
+
+    @Transactional
    public void hostEndMatch(UUID matchId, Long userId){
 
         LiveMatchStateDTO match = liveMatchStateRepository.findById(matchId).orElseThrow();
@@ -463,6 +473,8 @@ public class MatchServiceImplementation implements MatchService {
    }
 
     @Override
+
+    @Transactional
    public int hostNextProblem(UUID matchId, Long userId){
 
         LiveMatchStateDTO match = liveMatchStateRepository.findById(matchId).orElseThrow();
@@ -489,6 +501,7 @@ public class MatchServiceImplementation implements MatchService {
    }
 
     @Override
+    @Transactional
     public void switchTeamMatch(UUID matchId, Long userId,int toTeam){
 
 
@@ -515,6 +528,7 @@ public class MatchServiceImplementation implements MatchService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DiscussionDetailsResponse getTeamDiscussionCode(UUID matchId,long userId){
 
         int userTeamIndex  = -1;

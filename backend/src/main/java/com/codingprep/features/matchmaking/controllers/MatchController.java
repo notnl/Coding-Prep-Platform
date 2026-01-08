@@ -81,6 +81,8 @@ public class MatchController {
 
     @PostMapping("/{matchId}/startdiscussion")
     public ResponseEntity<Void> startTeamDiscussion(@PathVariable UUID matchId,@AuthenticationPrincipal AuthenticationUser user) {
+        
+        System.out.println("Start discussion triggered" );
         matchService.hostStartDiscussion(matchId,user.getId());
         return ResponseEntity.noContent().build();
     }

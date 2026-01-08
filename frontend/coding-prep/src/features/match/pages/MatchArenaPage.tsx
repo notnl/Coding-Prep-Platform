@@ -91,10 +91,12 @@ const useMatchEvents = (
         if (!matchId) return;
         stompService.connect();
 
+        console.log("Subscribe and connected to this");
         const subs = [
             stompService.subscribeToMatchUpdates(matchId, handleMatchEvent),
             stompService.subscribeToCountdown(matchId, handleCountdownEvent),
         ];
+
         return () => {
             subs.forEach(sub => { if (sub) sub.unsubscribe() });
         };
@@ -240,13 +242,6 @@ const MatchArenaPage: React.FC = () => {
         }
 
 
-
-
-        if (shouldRedirect && matchId) {
-            navigate(`/match/results/${matchId}`, { replace: true });
-        }
-    }, [shouldRedirect, matchId,auth?.userStatus?.in_match, navigate]);
-
     useMatchEvents(matchId,
         () => {
             setMatchState('COMPLETED');
@@ -264,6 +259,14 @@ const MatchArenaPage: React.FC = () => {
             setTimerData(payload);
         }
     );
+
+
+
+        if (shouldRedirect && matchId) {
+            navigate(`/match/results/${matchId}`, { replace: true });
+        }
+    }, [shouldRedirect, matchId,auth?.userStatus?.in_match, navigate]);
+
 
 
     const getDiscussionCode = async () => { 
