@@ -33,9 +33,7 @@ export default function ProfilePage({theme} : Props){
 
                     </div>
 
-
                     <div className="flex flex-wrap mx-10 my-10 gap-5 overflow-auto h-1/2">
-                        <MatchLobbyCard title='Test' matchID="10" playerCount={1} maxPlayerCount={2} joinRoomClick={ () => HandleSubmit("10") }  />
                     </div>
             </div>
 

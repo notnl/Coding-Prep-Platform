@@ -99,8 +99,8 @@ export default function Home({theme} : Props){
       </div>
       
       <div className="flex flex-wrap gap-5 overflow-auto p-4 rounded-lg border border-gray-200  h-full">
-        {allLobby?.length > 0 ? (
-          allLobby.map((lC: LobbyDetails, keyInd) => (
+        {allLobby?.length || 0 > 0 ? (
+          allLobby?.map((lC: LobbyDetails, keyInd) => (
             <MatchLobbyCard
               key={keyInd}
               title={lC.roomCode}
