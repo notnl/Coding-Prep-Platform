@@ -67,6 +67,7 @@ const useMatchEvents = (
     onMatchNextProblem: () => void,
     onCountdownStart: (data: { startTime: number; duration: number }) => void
 ) => {
+    // I have no clue why this is necessary, will redo this part 
     // useRef to store stable callbacks
     const callbacksRef = useRef({
         onMatchEnd,

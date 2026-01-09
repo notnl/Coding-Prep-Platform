@@ -136,9 +136,9 @@ public class MatchServiceImplementation implements MatchService {
     @Override
     @Transactional
     public CreateMatchResponse createMatch(CreateMatchRequest request, Long creatorId, String creatorUsername) {
-        if (request.getDifficultyMin() > request.getDifficultyMax()) {
-            throw new IllegalArgumentException("Minimum difficulty cannot be greater than maximum difficulty.");
-        }
+        //if (request.getDifficultyMin() > request.getDifficultyMax()) {
+        //    throw new IllegalArgumentException("Minimum difficulty cannot be greater than maximum difficulty.");
+        //}
         //String roomCode = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
         //
 
@@ -393,6 +393,8 @@ public class MatchServiceImplementation implements MatchService {
         for (LiveMatchStateDTO l : match) {
 
                 if (l != null && l.getMatchStatus() == MatchStatus.IN_LOBBY){
+
+
 
                         target.add(LobbyDetailsDTO.builder().matchId(l.getMatchId()).roomCode(l.getRoomCode()).build());
                 }

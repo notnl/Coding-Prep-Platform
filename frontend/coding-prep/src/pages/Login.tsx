@@ -4,6 +4,8 @@ import { useNavigate } from "react-router";
 import useAuth from "src/core/hooks/useAuth";
 import { AuthContext, type AuthContextType } from "src/core/context/AuthContext";
 
+import DevHubLogo from "../assets/devhublogo.svg";
+
 
 interface Props {
   theme: 'light' | 'dark';
@@ -39,7 +41,7 @@ export default function Login({theme} : Props){
                             return resolvedResponse.json()
                        }).catch(
                                 (e) => {
-                                    console.log("Caught htis : " + e)
+                                    console.log("Caught this : " + e)
                                 }
                        )
 
@@ -56,29 +58,49 @@ export default function Login({theme} : Props){
 
     const labelClass = theme === 'dark' ? 'text-gray-400' : 'text-slate-600';
     return (
+
         
         <form onSubmit={HandleSubmit} className="flex max-w-full h-screen justify-center items-center">
-                <div className="flex flex-col border-2 border-solid  min-w-1/2 min-h-1/2 items-center">
+
+
+
+
+                <div className="flex flex-col border-2 border-solid gap-8 min-w-1/3 min-h-1/2 items-center">
                             
                             <span className="text-5xl py-5">
                                     Coding Prep Platform
+
+          <img
+            className="z-50 inset-0 mx-auto h-8 w-auto transition-all duration-300 ease-in-out hover:scale-102"
+            src={DevHubLogo}
+            alt="DevHub Logo"
+          />
                             </span>
 
-                            <span className="text-1xl py-5">
-                                    Welcome to Coding Prep, compete with one another and share your answers to earn meaningful prizes
+
+
+                            <span>
+                            <span className="mx-10 font-bold ">
+                            Username : 
                             </span>
-
-
             <input id="Username" name="username" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="Key in any name"
               className={`border-2 border-solid selection:bg-indigo-500 min-w-1/2 ${labelClass}`}
               required disabled={loading}/>
+              </span>
 
+                            <span>
+
+                            <span className="mx-10 font-bold ">
+                            Password : 
+                            </span>
             <input id="Password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Key in any password"
               className={`border-2 border-solid selection:bg-indigo-500 min-w-1/2 ${labelClass}`}
               required disabled={loading}/>
 
+
+              </span>
             <button type="submit"
-              className="border-2 border-solid  min-w-1/8 min-h-1/4  bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-3 px-4 rounded-md transition-transform transform hover:scale-105 disabled:bg-orange-900/50 disabled:cursor-not-allowed disabled:transform-none"
+              className="border-2 border-solid  min-w-1/8 min-h-1/4  bg-[#F97316] hover:bg-[#EA580C] text-white font-bold py-3 px-4 my-30 rounded-md transition-transform transform hover:scale-105 disabled:bg-orange-900/50 disabled:cursor-not-allowed disabled:transform-none"
               disabled={loading }>
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Sign In'}
             </button>

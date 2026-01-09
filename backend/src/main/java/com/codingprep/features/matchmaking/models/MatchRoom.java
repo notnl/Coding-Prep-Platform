@@ -34,7 +34,7 @@ public class MatchRoom {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "host_id", nullable = false, unique = true)
+    @Column(name = "host_id", nullable = false)
     private Long host_id;
     
     @Enumerated(EnumType.STRING)

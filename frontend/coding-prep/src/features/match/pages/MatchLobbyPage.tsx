@@ -179,109 +179,128 @@ const MatchLobbyPage: React.FC = () => {
   if (!lobbyState) return null;
 
   return (
-    <MainLayout>
-      <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-10">
-          {timerData.startTime ? (    // Originally had state check, but just assume if startTime exists it is in scheduled , so to not fetch lobby data again, but if another person join then we will fetch regardlesss
-            isFinished ? (
-              <>
-                <p className="text-2xl font-semibold animate-pulse text-gray-700 dark:text-gray-400">Finalizing Match...</p>
-                <div className="my-3 flex justify-center items-center h-[96px]"><Loader2 className="animate-spin text-[#F97316]" size={72} /></div>
-                <p className="text-gray-500 dark:text-gray-500 mt-2">Preparing the arena...</p>
-                <p className="text-gray-500 dark:text-gray-500 mt-2">Scheduler runs every 10 seconds, so please wait </p>
-              </>
-            ) : (
-              <>
-                <p className="text-2xl font-semibold text-orange-500 dark:text-orange-400">Match Starting In</p>
-
-                  <h1 className="text-4xl font-bold text-gray-900 dark:text-white">{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}</h1>
-                <p className="text-gray-500 dark:text-gray-500 mt-2">The arena will open automatically.</p>
-              </>
-            )
-          ) : (
-            <>
-              <Swords className="text-[#F97316] mx-auto text-5xl mb-4 animate-pulse" />
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white">{statusMessage}</h1>
-              <p className="text-gray-500 dark:text-gray-500 mt-2">
-                {lobbyState.status === 'IN_LOBBY'
-                  ? `Players: ${lobbyState.allPlayers?.length || 0}/${lobbyState.maxPlayers} `
-                  : 'Please wait.'}
-              </p>
-              
-              {/* Start Match Button for Host */}
-              {isHost && lobbyState.status === 'IN_LOBBY' && (
-                <div className="mt-6">
-                  <button
-                    onClick={handleStartMatch}
-                    className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-lg rounded-lg hover:from-orange-600 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105"
-                  >
-                    <Play size={20} />
-                    Start Match
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-        
-        {/* 4-Team Grid Layout */}
-        <div className="grid grid-cols-2 gap-8">
-          {[0, 1, 2, 3].map((teamIndex) => (
-            <div 
-              key={teamIndex} 
-              className={`
-                p-6 rounded-xl border-2 
-                ${teamIndex === 0 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : ''}
-                ${teamIndex === 1 ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}
-                ${teamIndex === 2 ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''}
-                ${teamIndex === 3 ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20' : ''}
-                transition-all duration-300 hover:shadow-lg
-              `} onClick={ () => handleSwitchTeam(teamIndex) }
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Team {teamIndex + 1}
-                  {lobbyState.hostId && teamPlayers[teamIndex]?.some(p => p.player_id === lobbyState.hostId) && (
-                    <span className="ml-2 text-xs bg-yellow-500 text-white px-2 py-1 rounded-full">Host</span>
-                  )}
-                </h2>
-                <span className="text-sm font-semibold px-3 py-1 rounded-full bg-white dark:bg-gray-800">
-                  {teamPlayers[teamIndex]?.length || 0} players
-                </span>
-              </div>
-              
-              <div className="space-y-3">
-                {teamPlayers[teamIndex]?.length > 0 ? (
-                  teamPlayers[teamIndex].map((player,iIndex) => (
-                    <div 
-                      key={iIndex} 
-                      className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center text-white font-bold">
-                          {player.player_username?.charAt(0).toUpperCase() || 'P'}
-                        </div>
-                        <span className="font-medium text-gray-900 dark:text-white">
-                          {player.player_username}
-                        </span>
-                      </div>
-                      {player.player_id === lobbyState.hostId && (
-                        <span className="text-xs font-semibold px-2 py-1 rounded bg-yellow-500 text-white">Host</span>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-                    <p className="text-gray-500 dark:text-gray-400">Waiting for players...</p>
-                  </div>
-                )}
-              </div>
+<MainLayout>
+  <div className="container mx-auto max-w-6xl">
+    <div className="text-center mb-10">
+      {timerData.startTime ? (
+        isFinished ? (
+          <>
+            <p className="text-2xl font-semibold animate-pulse text-white">Finalizing Match...</p>
+            <div className="my-3 flex justify-center items-center h-[96px]">
+              <Loader2 className="animate-spin text-orange-500" size={72} />
             </div>
-          ))}
+            <p className="text-gray-400 mt-2">Preparing the arena...</p>
+            <p className="text-gray-400 mt-2">Scheduler runs every 10 seconds, so please wait</p>
+          </>
+        ) : (
+          <>
+            <p className="text-2xl font-semibold text-orange-500">Match Starting In</p>
+            <h1 className="text-5xl font-bold text-white mt-2">
+              {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+            </h1>
+            <p className="text-gray-400 mt-3">The arena will open automatically.</p>
+          </>
+        )
+      ) : (
+        <>
+          <div className="relative inline-block mb-6">
+            <div className="absolute -inset-2 bg-orange-500/20 rounded-full blur-md"></div>
+            <Swords className="text-orange-500 relative mx-auto text-6xl mb-2" />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-3">{statusMessage}</h1>
+          <p className="text-gray-400">
+            {lobbyState.status === 'IN_LOBBY'
+              ? `Players: ${lobbyState.allPlayers?.length || 0}/${lobbyState.maxPlayers}`
+              : 'Please wait.'}
+          </p>
+          
+          {/* Start Match Button for Host */}
+          {isHost && lobbyState.status === 'IN_LOBBY' && (
+            <div className="mt-8">
+              <button
+                onClick={handleStartMatch}
+                className="px-10 py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-orange-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="flex items-center gap-3">
+                  <Play size={22} />
+                  <span>Start Match</span>
+                </div>
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+    
+    {/* 4-Team Grid Layout */}
+    <div className="grid grid-cols-2 gap-8">
+      {[0, 1, 2, 3].map((teamIndex) => (
+        <div 
+          key={teamIndex} 
+          className={`
+            p-6 rounded-xl border-2 bg-black/50 backdrop-blur-sm
+            ${teamIndex === 0 ? 'border-blue-500 hover:border-blue-400' : ''}
+            ${teamIndex === 1 ? 'border-red-500 hover:border-red-400' : ''}
+            ${teamIndex === 2 ? 'border-green-500 hover:border-green-400' : ''}
+            ${teamIndex === 3 ? 'border-purple-500 hover:border-purple-400' : ''}
+            transition-all duration-300 hover:shadow-xl cursor-pointer
+          `} 
+          onClick={() => handleSwitchTeam(teamIndex)}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-white">
+                Team {teamIndex + 1}
+              </h2>
+              {lobbyState.hostId && teamPlayers[teamIndex]?.some(p => p.player_id === lobbyState.hostId) && (
+                <span className="text-xs font-semibold px-3 py-1 bg-yellow-500 text-white rounded-full">
+                  Host
+                </span>
+              )}
+            </div>
+            <span className="text-sm font-semibold px-4 py-2 rounded-full bg-gray-800 text-white border border-gray-700">
+              {teamPlayers[teamIndex]?.length || 0} players
+            </span>
+          </div>
+          
+          <div className="space-y-4">
+            {teamPlayers[teamIndex]?.length > 0 ? (
+              teamPlayers[teamIndex].map((player, iIndex) => (
+                <div 
+                  key={iIndex} 
+                  className="flex items-center justify-between p-4 bg-gray-900/50 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center text-white font-bold text-lg">
+                      {player.player_username?.charAt(0).toUpperCase() || 'P'}
+                    </div>
+                    <span className="font-medium text-white">
+                      {player.player_username}
+                    </span>
+                  </div>
+                  {player.player_id === lobbyState.hostId && (
+                    <span className="text-xs font-semibold px-3 py-1.5 bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 rounded">
+                      Host
+                    </span>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="text-center p-8 border-2 border-dashed border-gray-700 rounded-lg bg-gray-900/30">
+                <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center bg-gray-800 rounded-full">
+                  <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <p className="text-gray-500">Waiting for players...</p>
+              </div>
+            )}
+          </div>
         </div>
-
-      </div>
-    </MainLayout>
+      ))}
+    </div>
+  </div>
+</MainLayout>
   );
 };
 
