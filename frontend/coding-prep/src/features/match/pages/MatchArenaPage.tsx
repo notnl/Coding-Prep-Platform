@@ -293,6 +293,8 @@ const MatchArenaPage: React.FC = () => {
             setMatchState('IN_PROGRESS'); // Just reset back to in progress state
         },() => { 
             setCurrentProblem(prev => prev+1) // next problem
+            setActiveTab(0)
+            setActiveVisualTab(0);
         },
         (payload) => {
             setTimerData(payload);

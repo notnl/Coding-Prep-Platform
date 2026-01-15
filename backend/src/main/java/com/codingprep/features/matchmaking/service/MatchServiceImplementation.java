@@ -186,20 +186,16 @@ public class MatchServiceImplementation implements MatchService {
                  .hostId(creatorId).max_player_count(64)
                  .startDelayInSecond(request.getStartDelayInSecond())
                 .matchStatus(MatchStatus.IN_LOBBY).durationInMinutes(match.getDurationInMinutes()).startedAt(match.getStartedAt())
-                .currentProblem(0).maxProblemCount(allProblems.size()).allProblems(allProblems) // Assume 1 count
-                .build();
+                .currentProblem(0).maxProblemCount(allProblems.size()).allProblems(allProblems).build();
 
-
-
+// Assume 1 count
 
         liveMatchStateRepository.save(lM);  // Save to cache
-                                            //
                                             
         matchRedisService.addPlayer(savedMatch.getId(), builtPlayer); // Save player list to cache
 
         for (int i = 0; i < 4;++i){ // Create 4 keys for our player discusison repository for each team
             matchRedisService.createTeamScore(savedMatch.getId(), i, 0L);
-
         }
 //      Optional<DiscussionDetails> pD = playerDiscussionRepository.findById(savedMatch.getId());
 

@@ -63,7 +63,28 @@ services:
     restart: always
     volumes:
       - redis_data:/data
-
+#  prometheus:
+#    image: prom/prometheus:latest
+#    container_name: prometheus
+#    volumes:
+#      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#      - ./prometheus_db:/var/lib/prometheus
+#      - ./alert.rules:/etc/prometheus/alert.rules
+#    command:
+#      - '--config.file=/etc/prometheus/prometheus.yml'
+#      - '--web.route-prefix=/'
+#      - '--storage.tsdb.retention.time=200h'
+#      - '--web.enable-lifecycle'
+#    restart: unless-stopped
+#    ports:
+#      - '9090:9090'
+#    networks:
+#      - monitor-net
+#
+#  node-exporter:
+#    image: prom/node-exporter
+#    ports:
+#      - '9100:9100'
   #localstack:
   #  image: localstack/localstack:latest
   #  ports:
@@ -77,8 +98,37 @@ services:
   #  volumes:
   #    - localstack_data:/var/lib/localstack
   #    - /var/run/docker.sock:/var/run/docker.sock
+  #
+  cadvisor:
+    image: google/cadvisor:latest
+    ports:
+      - '9200:9200'
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+
+#  grafana:
+#    image: grafana/grafana
+#    user: "1000"
+#    environment:
+#      - GF_SECURITY_ADMIN_PASSWORD=secure_pass
+##    volumes:
+##      - ./grafana_db:/var/lib/grafana
+#    depends_on:
+#      - prometheus
+#    ports:
+#      - '3000:3000'
+#    networks:
+#      - monitor-net
+
 
 volumes:
   data:
   localstack_data:
   redis_data:
+
+networks:
+  monitor-net:
+    driver: bridge
