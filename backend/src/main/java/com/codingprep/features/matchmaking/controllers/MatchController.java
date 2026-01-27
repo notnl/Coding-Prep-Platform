@@ -1,10 +1,14 @@
 package com.codingprep.features.matchmaking.controllers;
 
+import com.codingprep.features.auth.dto.UserCredentials;
 import com.codingprep.features.auth.models.AuthenticationUser;
+import com.codingprep.features.auth.service.AuthenticationService;
 import com.codingprep.features.matchmaking.dto.*;
 import com.codingprep.features.matchmaking.service.MatchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -37,12 +41,36 @@ public class MatchController {
     public ResponseEntity<JoinMatchResponse> joinRoom(
              @RequestBody JoinMatchRequest request,
             @AuthenticationPrincipal AuthenticationUser user) {
-        System.out.println("Join req : " + request);
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal().getClass());
         
         JoinMatchResponse jR = matchService.joinMatch(request, user.getId(),user.getUsername()); // Will throw error if fail
                                                                                                  //
         System.out.println("Join response : " + jR);
+        return ResponseEntity.ok(jR);
+    }
+    @PostMapping("/leave")
+    public ResponseEntity<String> leaveRoom(
+             @RequestBody JoinMatchRequest request,
+            @AuthenticationPrincipal AuthenticationUser user) {
+        
+       matchService.joinMatch(request, user.getId(),user.getUsername()); // Will throw error if fail
+                                                                                                 //
+        return ResponseEntity.ok("Successfully left");
+    }
+
+    @PostMapping("/joinRoomCode")
+    public ResponseEntity<JoinMatchRoomCodeResponse> joinRoom( // configured without auth
+             @RequestBody JoinMatchRoomCodeRequest request,@RequestHeader(value="Authorization",required=false) String userAuth) {
+
+
+             
+        String existingAuthToken = null;
+        if (userAuth != null) {
+            existingAuthToken = userAuth.substring(7);
+        }
+            
+        JoinMatchRoomCodeResponse jR = matchService.joinMatchRoomCode(request,existingAuthToken); // Will create new user within the 
+        
+                                                                                                 //
         return ResponseEntity.ok(jR);
     }
 

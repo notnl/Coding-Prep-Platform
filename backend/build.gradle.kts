@@ -66,6 +66,8 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
 
 
+    implementation("org.apache.commons:commons-lang3:3.20.0")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 

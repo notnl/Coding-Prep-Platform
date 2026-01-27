@@ -1,6 +1,6 @@
 # Overview
 
-A Coding Platform referenced from (Abhinav1416 repo, please see disclaimer section) designed to encourage discussion-based solving. A self-hosted Judge0 API is used to judge submissions.
+A Coding Platform fork from Abhinav1416 , designed to encourage discussion-based solving. A self-hosted Judge0 API is used to judge submissions.
 
 
 # Configuration

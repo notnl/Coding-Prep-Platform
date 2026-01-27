@@ -13,11 +13,14 @@ export interface ProblemDetail {
     title: string;
     description: string;
     points: number;
+    order_by_tag: number;
     timeLimitMs: number;
     memoryLimitKb: number;
     sampleTestCases: SampleTestCase[];
     constraints: string; 
     difficulty: number;
+    templateCode: string[];
+
 }
 
 export interface SubmissionRequest {

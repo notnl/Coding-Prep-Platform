@@ -1,6 +1,12 @@
 package com.codingprep.features.submission.events;
 
 import com.codingprep.features.AWS.service.SqsService;
+import com.codingprep.features.submission.repository.SubmissionRepository;
+
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -14,6 +20,7 @@ public class SubmissionEventListener {
 
     private final SqsService sqsService;
     private static final Logger logger = LoggerFactory.getLogger(SubmissionEventListener.class);
+ //   private final SubmissionRepository submissionRepository;
 
     public SubmissionEventListener(SqsService sqsService) {
         this.sqsService = sqsService;

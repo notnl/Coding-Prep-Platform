@@ -85,63 +85,28 @@ public class SubmissionServiceImplementation implements SubmissionService {
     private static final Logger logger = LoggerFactory.getLogger(SubmissionServiceImplementation.class);
 
     @Override
-    @Transactional
-    @CacheEvict(value = "userProfiles", allEntries = true)
+   @Transactional  
     public Submission createSubmission(SubmissionRequest request, Long userId) {
+        
+        try { 
 
-
-        LiveMatchStateDTO match = liveMatchStateRepository.findById(request.getMatchId()).orElseThrow(() -> new IllegalArgumentException(
+        // 1. Validate match exists and is active
+        LiveMatchStateDTO match = liveMatchStateRepository.findById(request.getMatchId())
+                .orElseThrow(() -> new IllegalArgumentException(
                         "Match not found with ID: " + request.getMatchId()));
-
-
-
+        
         if (match.getMatchStatus() != MatchStatus.IN_PROGRESS) {
             throw new IllegalArgumentException("Submissions are only allowed for active matches.");
         }
-
+        
+        // 2. Validate user is in match
         UUID problemUUID = UUID.fromString(request.getProblemId());
-            
-
-
-        PlayerMatchDTO curUser = null;  // ensure that the user is in this match , if not will not create submission
-        for (PlayerMatchDTO d : matchRedisService.getAllPlayers(match.getMatchId())) {
-
-            if (d.getPlayer_id().equals(userId)) {
-                curUser = d;
-                break;
-            }
-
-        }
+        PlayerMatchDTO curUser = matchRedisService.getAllPlayers(match.getMatchId()).stream()
+                .filter(player -> player.getPlayer_id().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("User does not exist in this match"));
         
-       
-
-        if (curUser == null ){ 
-            throw new IllegalArgumentException("User does not exist in this match");
-        }
-        
-
-        //DiscussionDetailsKey dK = DiscussionDetailsKey.builder().matchId(request.getMatchId()).teamIndex(curUser.getPlayer_team()).build();
-        
-
-
-
-       matchRedisService.updatePlayerDiscussion(match.getMatchId(), userId,curUser.getPlayer_username(),curUser.player_team , request.getCode()); //Write the latest submission code to cache
-
-
-        Problem problem = problemRepository.findById(UUID.fromString(request.getProblemId())).get();
-                //.orElseThrow(() -> new InvalidRequestException("Problem not found with ID: " + request.getProblemId()));
-
-        if (problem.getStatus() != ProblemStatus.PUBLISHED) {
-            //throw new IllegalArgumentException("Submissions are only allowed for published problems.");
-        }
-
-
-        String logPrefix = String.format("[CREATE_SUBMISSION userId=%d, problemId=%s]", userId, request.getProblemId());
-        
-     //   logger.info("{} -> Starting submission creation.", logPrefix);
-
-
-        
+        // 3. Create and save submission FIRST
         Submission submission = Submission.builder()
                 .userId(userId)
                 .matchId(request.getMatchId())
@@ -151,19 +116,37 @@ public class SubmissionServiceImplementation implements SubmissionService {
                 .status(SubmissionStatus.PENDING)
                 .team_id(curUser.getPlayer_team())
                 .build();
-
-
-      //  logger.info("{} Entity saved with ID: {}", logPrefix, savedSubmission.getId());
-        Submission savedSubmission = submissionRepository.save(submission);
-
-        logger.info("{} Entity saved with MATCH ID : {}", logPrefix, savedSubmission.getMatchId());
-        logger.info("{} Entity saved with ID: {}", logPrefix, savedSubmission.getId());
-        logger.info("{} Entity saved with problem ID: {}", logPrefix, savedSubmission.getProblemId());
         
-        eventPublisher.publishEvent(new SubmissionCreatedEvent(this, savedSubmission.getId())); //Why do we need to do this ,because we can track if our save repository succeed or not 
-       // logger.info("{} Published SubmissionCreatedEvent. SQS message will be sent after commit.", logPrefix);
+        Submission savedSubmission = submissionRepository.save(submission);
+        logger.info("Submission saved with ID: {}, Match ID: {}", 
+            savedSubmission.getId(), savedSubmission.getMatchId());
+        
+        // 4. Publish event WITHIN transaction
+        eventPublisher.publishEvent(new SubmissionCreatedEvent(this, savedSubmission.getId()));
+        
+        // 5. Update Redis (outside transaction, handle failures)
+        try {
+            matchRedisService.updatePlayerDiscussion(
+                match.getMatchId(), 
+                userId,
+                curUser.getPlayer_username(),
+                curUser.getPlayer_team(), 
+                request.getCode()
+            );
+            logger.info("Redis cache updated successfully");
+        } catch (Exception e) {
+            logger.error("Failed to update Redis cache, but submission was saved. Submission ID: {}", 
+                savedSubmission.getId(), e);
+                    throw e;
+        }
 
+        
         return savedSubmission;
+        }
+        catch ( Exception e ) { 
+            logger.error("Error creating submission", e);
+             throw e;  
+        }
     }
 
 
@@ -307,7 +290,7 @@ public class SubmissionServiceImplementation implements SubmissionService {
             //}
 
             notificationService.notifyUser(submission.getUserId(), submission.getId(), finalResult);
-            //logger.info("{} <- Processing workflow completed successfully.", logPrefix);
+            logger.info("{} <- Processing workflow completed successfully.", logPrefix);
 
         } catch (Exception e) {
             logger.error("{} CRITICAL: An uncaught exception occurred. Updating submission to INTERNAL_ERROR.", logPrefix, e);

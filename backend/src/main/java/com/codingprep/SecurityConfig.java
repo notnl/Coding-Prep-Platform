@@ -68,7 +68,7 @@ public class SecurityConfig {
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
        http.csrf((csrfCustomizer) -> csrfCustomizer.disable()). 
-           authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/v1/auth/login","/api/v1/auth/register").permitAll()
+           authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/v1/auth/login","/api/v1/auth/register","/api/v1/match/joinRoomCode").permitAll()
                    .anyRequest().authenticated())
                      .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

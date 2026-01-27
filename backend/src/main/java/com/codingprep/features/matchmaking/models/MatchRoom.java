@@ -55,6 +55,9 @@ public class MatchRoom {
     @Column(name = "room_code", nullable = false, unique = true)
     private String roomCode;
 
+    @Column(name = "room_name", nullable = false, unique = true)
+    private String roomName;
+
     @Column(name = "duration_in_minutes", nullable = false)
     private Integer durationInMinutes;
 

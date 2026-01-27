@@ -1,9 +1,14 @@
 package com.codingprep.features.matchmaking.service;
 
+import com.codingprep.features.auth.dto.LoginRequest;
+import com.codingprep.features.auth.dto.UserCredentials;
 import com.codingprep.features.auth.dto.UserStatusDTO;
+import com.codingprep.features.auth.models.AuthenticationUser;
 import com.codingprep.features.auth.models.UserStatus;
 import com.codingprep.features.auth.repository.UserRepository;
 import com.codingprep.features.auth.repository.UserStatusRepository;
+import com.codingprep.features.auth.service.AuthenticationService;
+import com.codingprep.features.exception.InvalidParameterExceptionController;
 //import com.codingprep.features.authentication.model.AuthenticationUser;
 //import com.codingprep.features.authentication.repository.AuthenticationUserRepository;
 //import com.codingprep.features.exception.InvalidRequestException;
@@ -28,12 +33,14 @@ import com.codingprep.features.problem.models.ProblemStatus;
 import com.codingprep.features.problem.repository.ProblemRepository;
 import com.codingprep.features.redis.service.MatchRedisService;
 import com.codingprep.features.submission.models.SubmissionStatus;
+import org.apache.commons.lang3.RandomStringUtils;
 
 //import com.codingprep.features.submission.model.Submission;
 //import com.codingprep.features.submission.model.SubmissionStatus;
 //import com.codingprep.features.submission.repository.SubmissionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 //import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -55,6 +62,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
+import java.util.random.RandomGenerator;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.events.Characters;
@@ -74,9 +82,22 @@ public class MatchServiceImplementation implements MatchService {
     private final UserStatusRepository userStatusRepository;
     private final MatchNotificationService matchNotificationService;
     private final MatchRedisService matchRedisService;
+    private final AuthenticationService authenticationService;
 
 
     public static final long PENALTY_MINUTES = 5;
+
+    private final String[] MIX_MATCH = {
+        "Teddy", "Aurora", "Serenity", "Harmony", "Radiance", "Lumin", "Celeste", "Aether", "Nimbus", "Zephyr",
+        "Solace", "Emberlight", "Moonbeam", "Sunray", "Starlight", "Dream", "Hope", "Bliss", "Grace", "Tranquil",
+        "Elysium", "Heavenly", "Halo", "Glow", "Shimmer", "Glimmer", "Spark", "Fable", "Mythic", "Ethereal",
+        "Lullaby", "Echo", "Whisper", "Feather", "Breeze", "Cloudlet", "Mist", "Dewdrop", "Petal", "Bloom",
+        "Lotus", "Rosewind", "Silverleaf", "Goldenleaf", "Crystaline", "Prism", "Rainbow", "NovaLight", "Pure", "Kindle",
+        "Softlight", "Warmth", "Embrace", "Gentle", "Tender", "Calm", "Peace", "Unity", "Trust", "Faith",
+        "Spirit", "Soul", "Lightfall", "Skylace", "Starfall", "Moonlace", "Glowmist", "Dreamweave", "Hopewell", "Brighten",
+        "Seraph", "Angel", "Blessing", "Sanctum", "Sacred", "Purelight", "Heart", "Smile", "Joy", "Delight",
+        "Promise", "Shine", "Radiant", "Heartsong", "Dawn", "Twilight", "Daybreak", "Evenstar", "Skydream", "Cloudsong"
+    };
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
@@ -139,15 +160,17 @@ public class MatchServiceImplementation implements MatchService {
         //if (request.getDifficultyMin() > request.getDifficultyMax()) {
         //    throw new IllegalArgumentException("Minimum difficulty cannot be greater than maximum difficulty.");
         //}
-        //String roomCode = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
         //
+        //
+        String roomCode = RandomStringUtils.randomAlphanumeric(6).toUpperCase();
+
 
         //6 Characters worth of roomCode
         //byte[] bArray = new byte[6]; 
         //new Random().nextBytes(bArray);
 
 
-        String roomCode = request.getRoomCode();
+        String roomName = request.getRoomCode();
 
         List<PlayerMatchDTO> newCol = new ArrayList<PlayerMatchDTO>();
         PlayerMatchDTO builtPlayer = PlayerMatchDTO.builder().player_id(creatorId).player_username(creatorUsername).player_team(0).build();
@@ -155,6 +178,7 @@ public class MatchServiceImplementation implements MatchService {
 
 
         MatchRoom match = MatchRoom.builder()
+                 .roomName(roomName) 
                 .roomCode(roomCode)
                 .host_id(creatorId)
                 .max_player_count(64)
@@ -174,14 +198,9 @@ public class MatchServiceImplementation implements MatchService {
         }
 
         
-        //Map<Integer,Integer> allTeamScore = new HashMap<Integer,Integer>();
-
-        //for (int i = 0; i < 4;++i){
-        //    allTeamScore.put(i, 0);
-        //}
-
         //Cache initializations
             LiveMatchStateDTO lM = LiveMatchStateDTO.builder().matchId(savedMatch.getId())
+                .roomName(roomName)
                 .roomCode(roomCode)
                  .hostId(creatorId).max_player_count(64)
                  .startDelayInSecond(request.getStartDelayInSecond())
@@ -220,9 +239,60 @@ public class MatchServiceImplementation implements MatchService {
         return new CreateMatchResponse(savedMatch.getId(), roomCode);
     }
 
+    //@Override
+    //public JoinMatchResponse leaveMatchRoom(JoinMatchRequest request, Long joiningUserId, String joiningUserName) {
+
+
+
+    //}
+    @Override
+    public JoinMatchRoomCodeResponse joinMatchRoomCode(JoinMatchRoomCodeRequest request, String existing_acc_token) {
+
+        LiveMatchStateDTO match = liveMatchStateRepository.findByRoomCode(request.getRoomCode()).orElseThrow
+            ( () -> new IllegalArgumentException("Match does not exist"))
+             ;
+
+
+        if (match.getMatchStatus() != MatchStatus.IN_LOBBY) {
+            throw new IllegalArgumentException("This match is not in its lobby stage, can't join");
+        }
+
+        if (existing_acc_token != null) { 
+            //Join the room with existing access token
+                return new JoinMatchRoomCodeResponse(match.getMatchId(),existing_acc_token);
+        }
+
+
+        // 1️⃣ Atomically reserve lobby slot FIRST
+        boolean reserved = matchRedisService
+            .tryReserveSlot(match.getMatchId(), match.getMax_player_count());
+
+        if (!reserved) {
+            throw new IllegalArgumentException("Lobby is full");
+        }
+
+        System.out.println("AFter reserve");
+        int userNameIndex = matchRedisService.addToMatchNamingIndex(match.getMatchId(), 1L).intValue() % MIX_MATCH.length;
+
+        System.out.println("After Naming index");
+        LoginRequest regReq = new LoginRequest(MIX_MATCH[userNameIndex],"Password123!@"); 
+        RegisterRoomCodeDTO rDto = authenticationService.handleRegisterRequestByRoomCode(regReq);
+
+        matchRedisService.addPlayer(match.getMatchId(), PlayerMatchDTO.builder().player_id(rDto.getAU().getId()).player_username(rDto.getAU().getUsername()).player_team(0).build()); // Add player to the match
+
+
+        matchNotificationService.notifyPlayerJoined(match.getMatchId(),"PLAYER_JOINED");
+
+
+
+        UserStatus curUserStatus = userStatusRepository.findById(rDto.getAU().getId()).orElseThrow();
+        curUserStatus.setIn_match(match.getMatchId());
+        userStatusRepository.save(curUserStatus);
+
+        return new JoinMatchRoomCodeResponse(match.getMatchId(),rDto.getAccessToken());
+    }
 
     @Override
-    @Transactional
     public JoinMatchResponse joinMatch(JoinMatchRequest request, Long joiningUserId, String joiningUserName) {
 
         LiveMatchStateDTO match = liveMatchStateRepository.findById(request.getMatchId()).orElseThrow
@@ -244,8 +314,6 @@ public class MatchServiceImplementation implements MatchService {
         for (PlayerMatchDTO t : allP){
 
             if (t.player_id == joiningUserId) { 
-
-
                 return new JoinMatchResponse(match.getMatchId()); //Handle rejoin
             }
         
@@ -345,16 +413,22 @@ public class MatchServiceImplementation implements MatchService {
                 //.orElseThrow(() -> new ResourceNotFoundException("Problem not found for ID: " + liveState.getProblemId()));
 
 
-        ArrayList<ProblemDetailResponse> pDTOList = new ArrayList<ProblemDetailResponse>();  
-        
-//        ArrayList<ProblemDetailResponse> pDTOList = new ArrayList<ProblemDetailResponse>(); 
-//        
-        for (UUID uID : curMatch.getAllProblems()) {
+    int maxProblemSize = curMatch.getAllProblems().size();
+    List<ProblemDetailResponse> pDTOList =
+        new ArrayList<>(Collections.nCopies(maxProblemSize, null));
+    
 
-            Problem problemEntity = problemRepository.findById(uID).get(); // For now find 0 )
-            ProblemDetailResponse problemDTO = ProblemDetailResponse.fromEntity(problemEntity);
-            pDTOList.add(problemDTO);
+    for (UUID uID : curMatch.getAllProblems()) {
+
+        Problem problemEntity = problemRepository.findById(uID)
+                .orElseThrow(() -> new IllegalStateException("Problem not found: " + uID));
+
+        ProblemDetailResponse problemDTO = ProblemDetailResponse.fromEntity(problemEntity);
+        if (problemDTO.getOrder_by_tag().intValue() >= maxProblemSize){
+            throw new IllegalStateException("Invalid problem ordering size");
         }
+        pDTOList.set(problemDTO.getOrder_by_tag(), problemDTO);
+    }
 
         //
         //ProblemDetailResponse problemDTO = ProblemDetailResponse.fromEntity(twoSumProblem);

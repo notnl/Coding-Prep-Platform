@@ -32,6 +32,9 @@ public class ProblemInitiationRequest {
     @Max(value = 3500, message = "Maximum difficulty cannot exceed 3500")
     private Integer points;
 
+    @NotNull(message = "Order to be displayed must be provided")
+    private Integer order_for_tag;
+
     @NotNull(message = "Time limit must be provided.")
     @Min(value = 1, message = "Time limit must be at least 1 millisecond.")
     private Integer timeLimitMs;
@@ -45,7 +48,10 @@ public class ProblemInitiationRequest {
     private JsonNode sampleTestCases;
 
     @Size(min = 1, message = "At least one tag is required.")
-    private List<String> tags = new ArrayList<>();;
+    private List<String> tags = new ArrayList<>();
+
+    @Size(min = 1, message = "At least 1 input template must be given")
+    private List<String> templateCode = new ArrayList<>();
 }
 /*
  * 

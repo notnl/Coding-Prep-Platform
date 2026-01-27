@@ -28,6 +28,8 @@ import com.codingprep.features.auth.repository.RoleRepository;
 import com.codingprep.features.auth.repository.UserRepository;
 import com.codingprep.features.auth.repository.UserStatusRepository;
 import com.codingprep.features.auth.utils.PasswordValidator;
+import com.codingprep.features.matchmaking.dto.JoinMatchRoomCodeResponse;
+import com.codingprep.features.matchmaking.dto.RegisterRoomCodeDTO;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -79,7 +81,7 @@ public class AuthenticationService {
     public String handleRegisterRequest(LoginRequest lR) { 
 
             // Find in database see if username exists 
-        if (!userRepository.checkUserExists(lR.username()).isEmpty() ){
+        if (!userRepository.checkUserExists(lR.username()).isEmpty()){
 
             System.out.println("User Exist");
             throw new IllegalArgumentException("User already exists");
@@ -110,6 +112,46 @@ public class AuthenticationService {
         return "User registered!";
 
     }
+    
+    public RegisterRoomCodeDTO handleRegisterRequestByRoomCode(LoginRequest lR) { 
+
+
+            // Find in database see if username exists 
+        if (!userRepository.checkUserExists(lR.username()).isEmpty()){
+
+            System.out.println("User Exist");
+            throw new IllegalArgumentException("User already exists");
+        }
+
+        if (!PasswordValidator.isValid(lR.password())) {
+
+            throw new IllegalArgumentException("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+        }
+          
+        
+        AuthenticationUser aU = new AuthenticationUser(lR.username(),passwordEncoder.encode(lR.password()));
+
+
+
+        Role userRole = roleRepository.findByName(RoleType.ROLE_USER)
+                .orElseThrow(() -> new IllegalStateException("ROLE_USER not found in database."));
+        aU.setRoles(new HashSet<>(Set.of(userRole)));
+
+
+
+            // if not we add to database
+        userRepository.save(aU);
+        UserStatus uS = new UserStatus();
+        uS.setUser(aU);
+        userStatusRepository.save(uS);
+
+        String aToken = jwtService.generateAccessToken(aU);
+
+        return RegisterRoomCodeDTO.builder().accessToken(aToken).aU(aU).build();
+
+
+    }
+ 
     public UserStatusDTO handleUserStatus(Long uId) { 
         UserStatus uS = userStatusRepository.findById(uId).orElseThrow();
 

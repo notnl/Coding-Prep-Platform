@@ -47,6 +47,9 @@ public class Problem {
     @Column(nullable = false)
     private Integer points;
 
+    @Column(nullable = false)
+    private Integer order_for_tag;
+
     @Column(name = "time_limit_ms", nullable = false)
     private Integer timeLimitMs;
 
@@ -77,5 +80,11 @@ public class Problem {
     )
     @Builder.Default
     private Set<Tag> tags = new HashSet<>();
+
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "templateCode", columnDefinition = "jsonb")
+    private String templateCode;
+
 }
 

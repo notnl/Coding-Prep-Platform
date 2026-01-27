@@ -38,6 +38,7 @@ const useArenaData = (matchId: string | undefined) => {
         const fetchDetails = async () => {
             try {
                 const data = await getArenaData(matchId);
+                console.log(data)
                 setArenaData(data);
 
                  
@@ -185,6 +186,22 @@ const MatchArenaPage: React.FC = () => {
     return arenaData?.hostId === auth?.user?.id;
   }, [arenaData]);
 
+  const getTemplateCodeForCurrentProblem = React.useMemo(() => {
+      if (!arenaData || !arenaData.problemDetails || currentProblem > arenaData.problemDetails.length - 1 || arenaData.problemDetails[currentProblem].templateCode.length < 3){
+            return "";
+      }
+
+      switch (language) { 
+          case "cpp":
+            return arenaData.problemDetails[currentProblem].templateCode[1]
+          case "python":
+            return arenaData.problemDetails[currentProblem].templateCode[0]
+          case "java":
+            return arenaData.problemDetails[currentProblem].templateCode[2]
+      }
+
+  },[arenaData,currentProblem,language])
+
     useEffect(() => {
 
         if (code == undefined || !arenaData) { 
@@ -225,6 +242,7 @@ const MatchArenaPage: React.FC = () => {
 
                     const storageKey = `code-cache-${auth?.user?.username}-${matchId}-${ind}`;
                     const savedCode = localStorage.getItem(storageKey) || '';
+
 
                     test[ind] = savedCode
                 });
@@ -335,7 +353,6 @@ const MatchArenaPage: React.FC = () => {
             )
 
         setSubmissions(mapSumDetails) 
-
                 
         
     }
@@ -650,6 +667,7 @@ const MatchArenaPage: React.FC = () => {
                         <Panel defaultSize={50} minSize={35} className="flex flex-col bg-gray-50 dark:bg-zinc-900">
                             <CodeEditor
                                 language={language} setLanguage={setLanguage}
+                                codeTemplate={getTemplateCodeForCurrentProblem}
                                 code={code ? code[activeTab] : "Good luck!"} 
                                 tabIndex={activeTab}
                                 setCode={( activeTab, curCode) =>  {  //upon onChange editor, we will change the code for that index, which will save to localStorage

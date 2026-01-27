@@ -27,10 +27,18 @@ public class MatchRedisService {
         return "liveMatch:" + matchId + ":players";
     }
 
+    private String PlayerCountKeyString(UUID matchId){
+        return "liveMatch:" + matchId + ":count";
+    }
+
     private String ScoreKeyString(UUID matchId){
         return "liveMatch:" + matchId + ":scores";
     }
 
+
+    private String MatchNamingKeyString(UUID matchId){
+        return "liveMatch:" + matchId + ":nameIndex";
+    }
     private String TeamDiscussionKeyString(UUID matchId,int teamIndex){
         return "discussion:" + matchId + ":" + teamIndex;
     }
@@ -42,12 +50,25 @@ public class MatchRedisService {
         playerTemplate.opsForHash()
                 .put(key, player.getPlayer_id().toString(), player);
     }
+
+    public void removePlayer(UUID matchId, PlayerMatchDTO player) {
+
+        String key = PlayerKeyString(matchId);
+        playerTemplate.opsForHash()
+                .delete(key, player.getPlayer_id().toString(), player);
+    }
     public List<PlayerMatchDTO> getAllPlayers(UUID matchId) {
 
         String key = PlayerKeyString(matchId);
 
         return playerTemplate.opsForHash().values(key).stream().filter(PlayerMatchDTO.class::isInstance).map(
                 PlayerMatchDTO.class::cast).toList();
+
+    }
+    public boolean checkPlayerExist(UUID matchId, Long player_id) {
+
+        String key = PlayerKeyString(matchId);
+        return scoreTemplate.opsForHash().get(key,player_id.toString()) != null;
 
     }
     public void createTeamScore(UUID matchId, int teamIndex,Long byScore) { 
@@ -57,6 +78,31 @@ public class MatchRedisService {
         scoreTemplate.expire(key, Duration.ofHours(6L)); // After a set time just get rid of the score, don't really expect a live session to last longer than that
 
     }
+    public boolean tryReserveSlot(UUID matchId, int maxPlayers) {
+        // Redis INCR + check + DECR if over
+        String key = PlayerCountKeyString(matchId);
+        Long newCount = scoreTemplate.opsForValue()
+            .increment(key);
+
+        if (newCount > maxPlayers) {
+            scoreTemplate.opsForValue().decrement(key);
+            return false;
+        }
+        return true;
+
+    }
+
+    public Long addToMatchNamingIndex(UUID matchId, Long byScore) {
+        String key = MatchNamingKeyString(matchId);
+
+        Long curValue = scoreTemplate.opsForValue().increment(key, byScore);
+        
+
+        // Optionally ensure expiry is set (see note below)
+        scoreTemplate.expire(key, Duration.ofHours(6L));
+        return curValue;
+    }
+
     public void increaseTeamScore(UUID matchId, int teamIndex,Long byScore){
 
         String key = ScoreKeyString(matchId);

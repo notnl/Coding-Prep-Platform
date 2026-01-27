@@ -14,6 +14,8 @@ public interface MatchService {
 
     JoinMatchResponse joinMatch(JoinMatchRequest request, Long joiningUserId,String joiningUsername);
 
+    JoinMatchRoomCodeResponse joinMatchRoomCode(JoinMatchRoomCodeRequest request, String existing_acc_token);
+
     LobbyStateDTO getLobbyState(UUID matchId);
 
     List<LobbyDetailsDTO> getAllLobby();

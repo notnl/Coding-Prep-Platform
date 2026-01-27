@@ -1,4 +1,3 @@
-
 package com.codingprep.features.matchmaking.service;
 
 import java.util.List;
@@ -51,7 +50,7 @@ public class MatchNotificationServiceImplementation implements MatchNotification
     }
 
     @Override
-    public void notifyMatchUpdate(UUID matchId,String eventType){
+    public void notifyMatchUpdate(UUID matchId,String eventType) {
 
         String destination = getMatchTopic(matchId);
 

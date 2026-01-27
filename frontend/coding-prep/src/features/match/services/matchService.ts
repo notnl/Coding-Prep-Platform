@@ -47,7 +47,6 @@ export const getAllLobby = async () : Promise<LobbyDetails[]> => {
 
 export const getPointsForMatch = async (matchId: string) : Promise<number[]> => {
    return (await api_get(`${API_BASE_URL}/${matchId}/points`)).json();
-
 };
 
 //

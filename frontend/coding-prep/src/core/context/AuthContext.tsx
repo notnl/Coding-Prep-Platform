@@ -29,6 +29,7 @@ export interface AuthContextType {
     hasRole: (role: string) => boolean;
     updateUser: (user: AuthenticatedUser) => void;
     handleLoginSuccess: (accessToken: string, refreshToken: string) => void;
+    handleRoomCodeSuccess: (accessToken: string,matchId : string) => void;
     userStatus: UserStatus | null;
     
 }
@@ -70,6 +71,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         //const fetchedPermissions = await fetchMyPermissions();
         //setPermissions(fetchedPermissions);
         navigate('/home');
+    };
+
+    const handleRoomCodeSuccess  =  (accessToken: string,matchId : string) => {
+        localStorage.setItem('accessToken', accessToken);
+
+        const decoded = jwtDecode<DecodedToken>(accessToken);
+        setUser({
+            username: decoded.sub,
+            roles: decoded.roles,
+            id: decoded.userId,
+        });
+
+        navigate(`/match/lobby/${matchId}`);
+
     };
     const handleUserStatus =  async () => {
 
@@ -150,6 +165,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         hasRole,
         updateUser: setUser,
         handleLoginSuccess,
+        handleRoomCodeSuccess,
         userStatus
         
     //    googleLogin,

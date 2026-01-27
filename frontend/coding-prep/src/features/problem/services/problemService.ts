@@ -7,7 +7,6 @@ const API_BASE_URL = '/api/v1/submissions';
 const API_STATS_URL = '/stats';
 
 
-
 export const getProblemBySlug = async (slug: string): Promise<ProblemDetail> => {
     const response = await api_get(`/problems/${slug}`);
     const responseJson = await response.json();
@@ -19,8 +18,6 @@ export interface SubmissionResponse {
 }
 
 export const createSubmission = async (request: SubmissionRequest): Promise<SubmissionResponse> => {
-
-    
     const response = await api_post(`${API_BASE_URL}/create`, JSON.stringify(request));
 
     const responseJson = await response.json();

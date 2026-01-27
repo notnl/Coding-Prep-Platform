@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import com.codingprep.features.matchmaking.models.MatchStatus;
 import com.codingprep.features.problem.models.Problem;
@@ -28,7 +29,10 @@ public class LiveMatchStateDTO {
     private UUID matchId;
 
     private MatchStatus matchStatus;
+
+    @Indexed
     private String roomCode;
+    private String roomName;
 
     private Instant startedAt; // Time elapsed from arena start
     private Instant scheduledAt; // The actual scheduled time to start from lobby to arena

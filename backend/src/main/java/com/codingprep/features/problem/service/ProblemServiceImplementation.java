@@ -68,14 +68,19 @@ public class ProblemServiceImplementation implements ProblemService{
         problem.setDescription(requestDto.getDescription());
         problem.setConstraints(requestDto.getConstraints());
         problem.setPoints(requestDto.getPoints());
+        problem.setOrder_for_tag(requestDto.getOrder_for_tag());
         problem.setTimeLimitMs(requestDto.getTimeLimitMs());
         problem.setMemoryLimitKb(requestDto.getMemoryLimitKb());
         problem.setAuthorId(user.getId());
         problem.setTags(problemTags);
+
         problem.setStatus(ProblemStatus.PENDING_TEST_CASES);
 
         try {
             problem.setSampleTestCases(objectMapper.writeValueAsString(requestDto.getSampleTestCases()));
+            problem.setTemplateCode(objectMapper.writeValueAsString(requestDto.getTemplateCode()));
+
+            
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Internal error: Failed to serialize problem data.", e);
         }

@@ -13,9 +13,6 @@ export default function ProfilePage({theme} : Props){
     const [loading, setLoading] = useState(false)
 
 
-    const HandleSubmit = (matchID : string) => {
-    }
-
 
     const labelClass = theme === 'dark' ? 'text-gray-400' : 'text-slate-600';
     return (

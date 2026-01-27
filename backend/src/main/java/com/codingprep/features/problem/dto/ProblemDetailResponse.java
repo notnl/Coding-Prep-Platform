@@ -26,15 +26,18 @@ public class ProblemDetailResponse {
     private String description;
     private String constraints;
     private Integer points;
+    private Integer order_by_tag;
     private Integer timeLimitMs;
     private Integer memoryLimitKb;
     private Instant createdAt;
     private Object sampleTestCases;
+    private Object templateCode;
 
 
 
     public static ProblemDetailResponse fromEntity(Problem problem) {
         Object parsedSampleTestCases = null;
+        Object parsedTemplateCode = null;
         if (problem.getSampleTestCases() != null) {
             try {
                 parsedSampleTestCases = new ObjectMapper().readValue(problem.getSampleTestCases(), List.class);
@@ -45,6 +48,16 @@ public class ProblemDetailResponse {
                 parsedSampleTestCases = problem.getSampleTestCases();
             }
         }
+        if (problem.getTemplateCode() != null) {
+
+            try {
+                parsedTemplateCode = new ObjectMapper().readValue(problem.getTemplateCode(), List.class);
+
+            } catch (JsonProcessingException e) {
+                parsedTemplateCode = "";
+            }
+        }
+
 
         return ProblemDetailResponse.builder()
                 .id(problem.getId())
@@ -58,6 +71,8 @@ public class ProblemDetailResponse {
                 .memoryLimitKb(problem.getMemoryLimitKb())
                 .createdAt(problem.getCreatedAt())
                 .sampleTestCases(parsedSampleTestCases)
+                .order_by_tag(problem.getOrder_for_tag())
+                .templateCode(parsedTemplateCode)
                 .build();
     }
 }
