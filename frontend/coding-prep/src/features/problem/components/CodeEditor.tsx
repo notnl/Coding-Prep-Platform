@@ -44,7 +44,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 }) => {
     const { theme, toggleTheme } = useTheme();
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
-    const [editorTheme, setEditorTheme] = useState<'light' | 'dark'>(theme === 'dark' ? 'vs-dark' : 'light');
+    const [editorTheme, setEditorTheme] = useState<'light' | 'vs-dark'>();
 
     const openTemplateModal = () => {
         setIsTemplateModalOpen(true);
