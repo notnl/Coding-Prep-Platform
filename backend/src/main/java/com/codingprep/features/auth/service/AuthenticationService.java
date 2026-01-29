@@ -5,6 +5,7 @@ import java.io.Console;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -117,10 +118,16 @@ public class AuthenticationService {
 
 
             // Find in database see if username exists 
-        if (!userRepository.checkUserExists(lR.username()).isEmpty()){
+            // If so just reuse the same user in the database only by roomCode
+        Optional<AuthenticationUser> userExistCheck = userRepository.checkUserExists(lR.username());
+        if (!userExistCheck.isEmpty()){
 
-            System.out.println("User Exist");
-            throw new IllegalArgumentException("User already exists");
+            AuthenticationUser aU = userExistCheck.get();
+            String aToken = jwtService.generateAccessToken(aU);
+
+            System.out.println("User exist so just use existing access token");
+            return RegisterRoomCodeDTO.builder().accessToken(aToken).aU(aU).build();
+
         }
 
         if (!PasswordValidator.isValid(lR.password())) {
