@@ -71,7 +71,7 @@ export default function Login({theme} : Props){
             console.log("Joining room with code:", roomCode);
             const getExistingToken : string | null = localStorage.getItem("accessToken")
 
-             const r : JoinRoomResponseType  = await fetch('/api/v1/match/joinRoomCode', 
+             const r : Response  = await fetch('/api/v1/match/joinRoomCode', 
                         {
                                         method:"POST",
                                         body: JSON.stringify({roomCode:roomCode}),
@@ -80,22 +80,43 @@ export default function Login({theme} : Props){
                                             ...(getExistingToken && { Authorization: `Bearer ${getExistingToken}` }),
 
                                         },
-                        }
+                        })
+                if (!r.ok) {
+                     const errorText = await r.text()
+                     console.log(errorText)
+                     throw new Error(`HTTP error, status = ${r.status} + ${errorText}`);
+                }
 
-                       ).then((resolvedResponse : Response) => {
-      if (!resolvedResponse.ok) {
-            throw new Error(`HTTP error, status = ${resolvedResponse.status} , ${resolvedResponse.text()}`);
-          }
-                            return resolvedResponse.json()
-                       }).catch(
-                                (e) => {
-                                    console.error("Error converting to json: " + e.message)
-                                }
-                       )
-
-                       if (r) {
-                            auth?.handleRoomCodeSuccess(r.accessToken,r.matchId)
+                const convertJoinRoomResponse : JoinRoomResponseType = await r.json()
+                       if (convertJoinRoomResponse) {
+                            auth?.handleRoomCodeSuccess(convertJoinRoomResponse.accessToken,convertJoinRoomResponse.matchId)
                        }
+
+
+//             const r : JoinRoomResponseType  = await fetch('/api/v1/match/joinRoomCode', 
+//                        {
+//                                        method:"POST",
+//                                        body: JSON.stringify({roomCode:roomCode}),
+//                                        headers: {
+//                                            "Content-Type": "application/json",
+//                                            ...(getExistingToken && { Authorization: `Bearer ${getExistingToken}` }),
+//
+//                                        },
+//                        }
+//
+//                       ).then((resolvedResponse : Response) => {
+//      if (!resolvedResponse.ok) {
+//
+//            throw new Error(`HTTP error, status = ${resolvedResponse.status}`);
+//
+//          }
+//                            return resolvedResponse.json()
+//                       }).catch(
+//                                (e) => {
+//                                    console.error("Error converting to json: " + e.message)
+//                                }
+//                       )
+
             
             
             
