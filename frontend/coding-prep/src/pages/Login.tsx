@@ -83,6 +83,9 @@ export default function Login({theme} : Props){
                         }
 
                        ).then((resolvedResponse : Response) => {
+      if (!resolvedResponse.ok) {
+            throw new Error(`HTTP error, status = ${resolvedResponse.status} , ${resolvedResponse.text()}`);
+          }
                             return resolvedResponse.json()
                        }).catch(
                                 (e) => {

@@ -257,12 +257,6 @@ public class MatchServiceImplementation implements MatchService {
             throw new IllegalArgumentException("This match is not in its lobby stage, can't join");
         }
 
-        if (existing_acc_token != null) { 
-            //Join the room with existing access token
-                return new JoinMatchRoomCodeResponse(match.getMatchId(),existing_acc_token);
-        }
-
-
         // 1️⃣ Atomically reserve lobby slot FIRST
         boolean reserved = matchRedisService
             .tryReserveSlot(match.getMatchId(), match.getMax_player_count());
